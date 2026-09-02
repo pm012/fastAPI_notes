@@ -1,16 +1,19 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from typing import AsyncGenerator
 
+# Зверніть увагу на +asyncpg у рядку підключення
+SQLALCHEMY_DATABASE_URL = "postgresql+asyncpg://serhii:secret01@localhost:5432/rest_app"
 
-SQLALCHEMY_DATABASE_URL = "postgresql://serhii:secret01@localhost:5432/rest_app"
+# Створюємо асинхронний рушій
+engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=False)
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+# Створюємо фабрику асинхронних сесій
+AsyncSessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind=engine, class_=AsyncSession)
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+# Асинхронний генератор сесій для FastAPI
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    async with AsyncSessionLocal() as db:
+        try:
+            yield db
+        finally:
+            await db.close()

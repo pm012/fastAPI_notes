@@ -19,14 +19,14 @@ dependencies = [
     "idna (==3.19)",
     "mako (==1.4.1)",
     "markupsafe (==3.0.3)",
-    "psycopg2-binary (==2.9.12)",
     "pydantic (==2.13.5)",
     "pydantic-core (==2.46.5)",
     "sqlalchemy (==2.0.52)",
     "starlette (==1.6.0)",
     "typing-inspection (==0.4.4)",
     "typing-extensions (==4.16.0)",
-    "uvicorn (==0.52.4)"
+    "uvicorn (==0.52.4)",
+    "asyncpg (>=0.31.0,<0.32.0)"
 ]
 
 
