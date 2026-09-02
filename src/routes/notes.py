@@ -21,7 +21,7 @@ async def read_note(note_id: int, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Note not found")
     return note
 
-@router.post("/", response_model=NoteResponse)
+@router.post("/", response_model=NoteResponse, status_code=status.HTTP_201_CREATED) # Додано правильний статус успішного створення 201
 async def create_note(body: NoteModel, db: AsyncSession = Depends(get_db)):
     return await repository_notes.create_note(body, db)
 
@@ -29,23 +29,19 @@ async def create_note(body: NoteModel, db: AsyncSession = Depends(get_db)):
 async def update_note(body: NoteUpdate, note_id: int, db: AsyncSession = Depends(get_db)):
     note = await repository_notes.update_note(note_id, body, db)
     if note is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Note not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Note not found") # Виправлено: status_code=
     return note
-
 
 @router.patch("/{note_id}", response_model=NoteResponse)
 async def update_status_code(body: NoteStatusUpdate, note_id: int, db: AsyncSession = Depends(get_db)):
     note = await repository_notes.update_status_note(note_id, body, db)
     if note is None:
-        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail="Note not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Note not found")
     return note
 
 @router.delete("/{note_id}", response_model=NoteResponse)
-async def remove_note(note_id: int, db: AsyncSession=Depends(get_db)):
+async def remove_note(note_id: int, db: AsyncSession = Depends(get_db)):
     note = await repository_notes.remove_note(note_id, db)
     if note is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Note not found")
-    
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Note not found") # Виправлено: status_code=
     return note
-
-    

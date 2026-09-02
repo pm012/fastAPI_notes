@@ -1,10 +1,12 @@
 from fastapi import FastAPI
-from src.routes import notes, tags
+from src.routes.notes import router as notes_router
+from src.routes.tags import router as tags_router
 
 app = FastAPI()
 
-app.include_router(tags.router, prefix='/api')
-app.include_router(notes.router, prefix='/api')
+# Підключаємо роутери з їхніми новими змінними
+app.include_router(tags_router, prefix='/api')
+app.include_router(notes_router, prefix='/api')
 
 @app.get("/")
 def read_root():
