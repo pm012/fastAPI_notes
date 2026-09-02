@@ -5,7 +5,7 @@ services:
     image: postgres:16-alpine
     container_name: fastapi_postgres
     environment:
-      POSTRES_USER: serhii
+      POSTGRES_USER: serhii
       POSTGRES_PASSWORD: secret01
       POSTGRES_DB: rest_app
     ports:
