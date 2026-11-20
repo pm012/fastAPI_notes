@@ -17,12 +17,12 @@ async def get_note(note_id: int, db: AsyncSession) -> Note | None:
     return result.scalar_one_or_none()
 
 async def create_note(body: NoteModel, db: AsyncSession) -> Note:
-    # 1. Шукаємо теги за їхніми ID
+    # 1. Search tags, using their  IDs
     query = select(Tag).filter(Tag.id.in_(body.tags))
     result = await db.execute(query)
     tags = list(result.scalars().all())
     
-    # 2. Створюємо об'єкт нотатки
+    # 2. Create nots opbject
     note = Note(
         title=body.title, 
         description=body.description, 
@@ -31,17 +31,17 @@ async def create_note(body: NoteModel, db: AsyncSession) -> Note:
     
     db.add(note)
     
-    # Замість commit() спочатку робимо flush(). 
-    # Це згенерує ID для нотатки в базі даних, але не скине стан об'єкта.
+    # Instead commit() doing flush(). 
+    # this will generate ID for the note in the database, but will not reset object state.
     await db.flush()
     
-    # Надійно зберігаємо згенерований ID в окрему Python-змінну
+    # Saveing generated ID to separate  Python-variable
     generated_id = note.id
     
-    # Тепер можна безпечно коммітити трансляцію
+    # Now we can safely commit transaction
     await db.commit()
     
-    # 3. Робимо чистий асинхронний запит, використовуючи збережену змінну
+    # 3. Performing clean asyncronous request using saved variable
     final_query = select(Note).options(selectinload(Note.tags)).filter(Note.id == generated_id)
     final_result = await db.execute(final_query)
     return final_result.scalar_one()
@@ -54,7 +54,7 @@ async def remove_note(note_id: int, db: AsyncSession) -> Note | None:
     return note
 
 async def update_note(note_id: int, body: NoteUpdate, db: AsyncSession) -> Note | None:
-    # Використовуємо options(selectinload) для оновлення зв'язків
+    # Using options(selectinload) for relationships update
     query = select(Note).options(selectinload(Note.tags)).filter(Note.id == note_id)
     result = await db.execute(query)
     note = result.scalar_one_or_none()
